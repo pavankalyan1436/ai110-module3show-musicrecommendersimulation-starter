@@ -49,7 +49,7 @@ My simulator is purely **content-based**. It has no other users to learn from, s
 | Energy closeness: `1.5 × (1 − abs(song.energy − target_energy))` | 0 to 1.5 |
 | Acoustic fit: `acousticness` if `likes_acoustic`, else `1 − acousticness` | 0 to 1.0 |
 
-Genre is weighted just above mood (mood is about 0.75× genre). Genre is the steadier taste and should win ties, but mood is the only label that links songs across genres (for example "intense" covers both rock and pop), so it still needs real weight. A song that matches both genre and mood (3.5 points) always beats a song that matches neither (2.5 points at most). Because most genres and moods appear on only one song, the labels only separate the top few results; everything else is ranked by the smooth energy and acousticness scores. These weights are a starting guess that I will test and tune in Phase 3.
+Genre is weighted just above mood (mood is about 0.75× genre). Genre is the steadier taste and should win ties, but mood is the only label that links songs across genres (for example "intense" covers both rock and pop), so it still needs real weight. A song that matches both genre and mood (3.5 points) always beats a song that matches neither (2.5 points at most). Because most genres and moods appear on only one song, the labels only separate the top few results; everything else is ranked by the smooth energy and acousticness scores. These weights were my starting guess; the experiments below check how sensitive the rankings are to them.
 
 **Ranking rule** (whole catalog): score every song with the scoring rule, sort by score from highest to lowest, and return the top `k`. The scoring rule can only say how good *one* song is; the ranking rule turns those separate scores into an ordered list. Each result also carries a short "because..." explanation built from the components that earned points.
 
@@ -98,7 +98,7 @@ You can add more tests in `tests/test_recommender.py`.
 
 ## Sample Recommendation Output
 
-Output of `python -m src.main` for the default pop/happy profile:
+Output for the starter pop/happy profile (energy 0.8). The current `python -m src.main` prints all six profiles; their outputs are in the experiments section below:
 
 ```text
 ============================================================
@@ -406,7 +406,12 @@ Profile: Acoustic Lover Wanting Max Energy
 
 ### Experiment notes
 
-(Add your weight-shift or feature-removal results here.)
+**Weight shift: energy x2, genre x0.5.** I changed the energy weight from 1.5 to 3.0 and the genre weight from 2.0 to 1.0 (mood and acoustic stayed the same, so the maximum score became 6.5). Run it with `python -m src.experiment`.
+
+- High-Energy Pop, Chill Lofi, and Deep Intense Rock: the top two songs stayed the same. Only positions 3 to 5 reshuffled (for example, Storm Runner and Laser Horizon swapped for Pop, and Focus Flow and Spacewalk Thoughts swapped for Lofi).
+- Genre Not in Catalog: Rooftop Lights and Sunrise City swapped first and second place, because without a genre match the energy score decides.
+- Sad but Energetic: Bayou Midnight (energy 0.40) was still first, even though the listener asked for energy 0.95.
+- Conclusion: the change made the lists different but not clearly more accurate. Exact genre and mood matches still outweigh the energy the listener asked for.
 
 ---
 
