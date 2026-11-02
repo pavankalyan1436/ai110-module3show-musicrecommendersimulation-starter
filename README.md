@@ -40,14 +40,12 @@ My simulator is purely **content-based**. It has no other users to learn from, s
 
 ### Algorithm recipe
 
-**Scoring rule** (one song vs. one user; max 5.0 points):
-
 | Component | Points |
 |---|---|
 | Genre matches `favorite_genre` | +2.0 |
-| Mood matches `favorite_mood` | +1.0 |
+| Mood matches `favorite_mood` | +1.5 |
 | Energy closeness: `1.5 × (1 − abs(song.energy − target_energy))` | 0 to 1.5 |
-| Acoustic fit: `0.5 × acousticness` if `likes_acoustic`, else `0.5 × (1 − acousticness)` | 0 to 0.5 |
+| Acoustic fit: `acousticness` if `likes_acoustic`, else `1 − acousticness` | 0 to 1.0 |
 
 Genre is weighted above mood because a genre mismatch is usually a bigger "wrong vibe" than a mood mismatch. These weights are a starting guess that I will test and tune in Phase 3.
 
