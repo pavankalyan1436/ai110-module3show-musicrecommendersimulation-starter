@@ -11,7 +11,7 @@ Your goal is to:
 - Evaluate what your system gets right and wrong
 - Reflect on how this mirrors real world AI recommenders
 
-Replace this paragraph with your own summary of what your version does.
+VibeMatch is a small, explainable music recommender. It loads a 20-song CSV, compares every song to a listener's favorite genre, favorite mood, target energy, and acoustic taste, gives each song up to 6 points, and prints the top 5 with the reasons for each score. I tested it on six profiles, including three built to trick it, and found that exact genre and mood matches can outweigh what the listener asked for on energy.
 
 ---
 
@@ -412,15 +412,12 @@ Profile: Acoustic Lover Wanting Max Energy
 
 ## Limitations and Risks
 
-Summarize some limitations of your recommender.
+- The catalog has only 20 songs, and 15 of its 17 genres appear on a single song, so a genre match can only boost one or two songs.
+- Exact label matches (genre 2.0 + mood 1.5) can outweigh energy (max 1.5): a slow blues song ranked first for a listener who asked for energy 0.95.
+- Matches are all-or-nothing, so close genres and moods ("pop" and "indie pop") earn nothing.
+- It ignores lyrics, language, tempo, valence, and danceability, and it never learns from skips or likes.
 
-Examples:
-
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
+See the [Model Card](model_card.md) for the full discussion.
 
 ---
 

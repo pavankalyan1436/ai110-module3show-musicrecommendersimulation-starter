@@ -1,21 +1,25 @@
 # 🎧 Model Card: Music Recommender Simulation
 
-## 1. Model Name  
+## 1. Model Name
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+**VibeMatch 1.0**
 
 ---
 
-## 2. Intended Use  
+## 2. Intended Use
 
-Describe what your recommender is designed to do and who it is for. 
+**Goal.** VibeMatch suggests the top 5 songs from a small catalog for one listener. It predicts which songs fit best based on the listener's favorite genre, favorite mood, target energy, and whether they like acoustic music.
 
-Prompts:  
+**Assumptions about the user.** The listener can say what they like up front. Their taste stays the same. One profile describes them.
 
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+**Intended use.** Classroom exploration. It is a way to learn how a score turns data into a ranked list, and how simple rules can be explained.
+
+**Not intended for.**
+
+- A real music app or real listeners. The catalog has only 20 songs.
+- Decisions about artists, such as who gets exposure or pay.
+- Claims about what any group of people likes. The listener profiles are made up.
+- Anything that needs fairness guarantees. It has not been checked for them.
 
 ---
 
@@ -40,28 +44,22 @@ Think of the recommender as a judge that grades every song in the catalog agains
 
 ---
 
-## 4. Data  
+## 4. Data
 
-Describe the dataset the model uses.  
-
-Prompts:  
-
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+- The catalog has **20 songs** in `data/songs.csv`. The first 10 came with the starter project. I added 10 more with an AI assistant to cover more genres and moods.
+- Each song has: genre, mood, energy, tempo, valence, danceability, and acousticness. The model only uses genre, mood, energy, and acousticness.
+- The catalog covers **17 genres** and **16 moods**. Pop has 2 songs, lofi has 3, and the other 15 genres have exactly 1 song each. 13 of the 16 moods also appear only once.
+- The numbers are rough estimates, not measured from real audio. The 10 songs I added are invented.
+- Missing from the data: lyrics, language, artist popularity, release year, and any listening history such as skips or likes. Taste in the catalog also leans toward Western genres.
 
 ---
 
-## 5. Strengths  
+## 5. Strengths
 
-Where does your system seem to work well  
-
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+- It separates very different tastes. Pop and Lofi share no songs. Lofi and Rock share no songs.
+- Chill Lofi got three calm lofi tracks in the top three (Library Rain, Midnight Coding, Focus Flow). Deep Intense Rock got Storm Runner first, with the top score of 5.88.
+- Energy is scored by closeness, not "higher is better," so a calm listener is not pushed toward loud songs.
+- Every result comes with reasons, such as "genre match (+2.0)." This makes it easy to see why a song was picked and to spot bad picks.
 
 ---
 
@@ -108,25 +106,21 @@ Other limits I noticed:
 
 ---
 
-## 8. Future Work  
+## 8. Future Work
 
-Ideas for how you would improve the model next.  
-
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
+- **Give partial credit for close labels.** Rock and metal, or happy and euphoric, are close but score zero today. For the rock profile, Iron Cathedral only reached fourth place for this reason.
+- **Use the features I ignored.** Valence, danceability, and tempo could help tell an intense workout song from a happy one.
+- **Add variety to the top 5.** A diversity rule would stop one kind of song, like Gym Hero, from filling many lists.
+- **Allow several favorite genres and moods,** and a much bigger catalog, so labels help more than one or two songs.
+- **Learn from behavior.** Real apps use skips, likes, and playlists. This version never changes its mind.
 
 ---
 
-## 9. Personal Reflection  
+## 9. Personal Reflection
 
-A few sentences about your experience.  
+TODO: replace this with your own words. Answer these four questions:
 
-Prompts:  
-
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+- What was your biggest learning moment during this project?
+- How did AI tools help you, and when did you need to double-check them?
+- What surprised you about how simple rules can still feel like recommendations?
+- What would you try next if you extended this project?
