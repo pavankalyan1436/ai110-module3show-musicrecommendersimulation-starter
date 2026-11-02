@@ -19,18 +19,24 @@ Prompts:
 
 ---
 
-## 3. How the Model Works  
+## 3. How the Model Works
 
-Explain your scoring approach in simple language.  
+Think of the recommender as a judge that grades every song in the catalog against one listener's wish list, then hands back the best matches.
 
-Prompts:  
+**What describes each song.** Every song has a genre, a mood, an energy level from 0 (very calm) to 1 (very intense), and an acousticness from 0 (fully electronic) to 1 (fully acoustic). The catalog also stores tempo, valence, and danceability, but the model does not use those yet.
 
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
+**What the listener tells it.** A favorite genre, a favorite mood, a target energy level, and whether they like acoustic-sounding music.
 
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+**How a song earns points (out of 6):**
+
+- 2.0 points if the genre matches the listener's favorite exactly.
+- 1.5 points if the mood matches exactly.
+- Up to 1.5 points for energy. The closer the song's energy is to the listener's target, the more points it gets. A perfect match earns the full 1.5, and the points shrink as the gap grows. This is about closeness, not "more is better": someone who wants calm music is not rewarded for a high-energy song.
+- Up to 1.0 point for acoustic fit. Listeners who like acoustic music give more points to acoustic songs, and everyone else gives more points to electronic ones.
+
+**How it picks what to recommend.** The model grades every song one by one, sorts all the grades from highest to lowest, and returns the top five. Each recommendation also comes with a short list of reasons (for example, "genre match" or "energy closeness") so the listener can see why it was chosen.
+
+**What I changed from the starter.** The starter code just returned the first few songs in the file with a placeholder explanation. I wrote the code that loads the song file, the scoring rule that produces a score plus reasons, and the ranking step. I also grew the catalog from 10 to 20 songs, gave mood slightly more weight than the suggested starting point (1.5 instead of 1.0) so it can connect songs across genres, and added the acoustic-fit score.
 
 ---
 
