@@ -23,7 +23,7 @@ Platforms like Spotify and YouTube mix two main ideas. **Collaborative filtering
 
 ### What my version does
 
-My simulator is purely **content-based**. It has no other users to learn from, so it can't do collaborative filtering. It prioritizes, in order: a genre match, a mood match, how *close* a song's energy is to the user's target, and a small nudge for acoustic taste. Closeness matters more than "higher is better": a user who wants energy 0.4 should not be pushed toward a 0.93 workout track just because it has more energy.
+My simulator is purely **content-based**. It has no other users to learn from, so it can't do collaborative filtering. It prioritizes, in order: a genre match, a mood match, how *close* a song's energy is to the user's target, and how well its acousticness fits the user's taste. Closeness matters more than "higher is better": a user who wants energy 0.4 should not be pushed toward a 0.93 workout track just because it has more energy.
 
 **`Song` features** (from `data/songs.csv`)
 
@@ -40,6 +40,8 @@ My simulator is purely **content-based**. It has no other users to learn from, s
 
 ### Algorithm recipe
 
+**Scoring rule** (one song vs. one user; max 6.0 points):
+
 | Component | Points |
 |---|---|
 | Genre matches `favorite_genre` | +2.0 |
@@ -47,14 +49,21 @@ My simulator is purely **content-based**. It has no other users to learn from, s
 | Energy closeness: `1.5 × (1 − abs(song.energy − target_energy))` | 0 to 1.5 |
 | Acoustic fit: `acousticness` if `likes_acoustic`, else `1 − acousticness` | 0 to 1.0 |
 
-Genre is weighted above mood because a genre mismatch is usually a bigger "wrong vibe" than a mood mismatch. These weights are a starting guess that I will test and tune in Phase 3.
+Genre is weighted just above mood (mood is about 0.75× genre). Genre is the steadier taste and should win ties, but mood is the only label that links songs across genres (for example "intense" covers both rock and pop), so it still needs real weight. A song that matches both genre and mood (3.5 points) always beats a song that matches neither (2.5 points at most). Because most genres and moods appear on only one song, the labels only separate the top few results; everything else is ranked by the smooth energy and acousticness scores. These weights are a starting guess that I will test and tune in Phase 3.
 
 **Ranking rule** (whole catalog): score every song with the scoring rule, sort by score from highest to lowest, and return the top `k`. The scoring rule can only say how good *one* song is; the ranking rule turns those separate scores into an ordered list. Each result also carries a short "because..." explanation built from the components that earned points.
 
+**Data flow**
+
+    Input:   user_prefs (genre, mood, energy, likes_acoustic) + data/songs.csv
+    Process: for each song -> score_song(user_prefs, song) -> (score, reasons)
+    Output:  sort scores high to low -> top K songs with explanations
+
 ### Known limits of this design
 
-- A genre match is all-or-nothing, so "indie pop" earns nothing for a "pop" fan even though the two are close.
-- With a 10-song catalog, a heavy genre weight can crowd out good songs from other genres (a small filter bubble).
+- A genre match is all-or-nothing, so "indie pop" earns nothing for a "pop" fan even though the two are close. The same is true of moods ("happy" vs. "euphoric").
+- Genre carries the most weight, so it can crowd out good songs from other genres (a small filter bubble). For example, Gym Hero (pop, intense) can outrank a better mood match for a pop/happy listener.
+- Most genres and moods appear on only one song in the 20-song catalog, so labels only boost the top few results; positions beyond that are ranked by energy and acousticness alone.
 - Nothing here learns from skips or likes, so the profile never changes.
 
 ---
@@ -63,32 +72,25 @@ Genre is weighted above mood because a genre mismatch is usually a bigger "wrong
 
 ### Setup
 
-1. Create a virtual environment (optional but recommended):
+**1. Create a virtual environment** (optional but recommended):
 
-   `````bash
-   python -m venv .venv
-   source .venv/bin/activate      # Mac or Linux
-   .venv\Scripts\activate         # Windows
+    python -m venv .venv
+    source .venv/bin/activate      # Mac or Linux
+    .venv\Scripts\activate         # Windows
 
-2. Install dependencies
+**2. Install dependencies:**
 
-```bash
-pip install -r requirements.txt
-```
+    pip install -r requirements.txt
 
-3. Run the app:
+**3. Run the app:**
 
-```bash
-python -m src.main
-```
+    python -m src.main
 
 ### Running Tests
 
 Run the starter tests with:
 
-```bash
-pytest
-```
+    pytest
 
 You can add more tests in `tests/test_recommender.py`.
 
@@ -98,14 +100,12 @@ You can add more tests in `tests/test_recommender.py`.
 
 Paste a sample of your recommender's output here as a text block so a reader can see what it produces:
 
-`````
-# e.g.:
-# User profile: genre=indie, mood=chill, energy=low
-# Recommendations:
-#   1. ...
-#   2. ...
-#   3. ...
-`````
+    # e.g.:
+    # User profile: genre=indie, mood=chill, energy=low
+    # Recommendations:
+    #   1. ...
+    #   2. ...
+    #   3. ...
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or demo video link here -->
 
@@ -145,20 +145,3 @@ Write 1 to 2 paragraphs here about what you learned:
 
 - about how recommenders turn data into predictions
 - about where bias or unfairness could show up in systems like this
-`````
-
-After pasting, save the file and check it:
-
-`````bash
-grep -n '^## ' README.md
-`````
-
-You should see seven headings. Then commit and push:
-
-`````bash
-git add README.md
-git commit -m "Fix README: restore all sections and add Phase 1 design"
-git push
-`````
-
-Paste the `grep` output once it's done, and we'll move on to the extra songs.
