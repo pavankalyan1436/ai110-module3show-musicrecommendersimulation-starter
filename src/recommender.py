@@ -58,36 +58,42 @@ def load_songs(csv_path: str) -> List[Dict]:
     print(f"Loaded songs: {len(songs)}")
     return songs
 
-def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
-    """Score one song (max 6.0 points) using the Phase 2 recipe; return (score, reasons)."""
+# Points available for each part of the scoring recipe (max total = 6.0)
+DEFAULT_WEIGHTS = {"genre": 2.0, "mood": 1.5, "energy": 1.5, "acoustic": 1.0}
+
+def score_song(user_prefs: Dict, song: Dict, weights: Optional[Dict] = None) -> Tuple[float, List[str]]:
+    """Score one song using the weighted recipe; return (score, reasons)."""
+    w = weights or DEFAULT_WEIGHTS
     score = 0.0
     reasons = []
 
     if song["genre"] == user_prefs["genre"]:
-        score += 2.0
-        reasons.append("genre match (+2.0)")
+        score += w["genre"]
+        reasons.append(f"genre match (+{w['genre']:.1f})")
 
     if song["mood"] == user_prefs["mood"]:
-        score += 1.5
-        reasons.append("mood match (+1.5)")
+        score += w["mood"]
+        reasons.append(f"mood match (+{w['mood']:.1f})")
 
-    energy_points = 1.5 * (1 - abs(song["energy"] - user_prefs["energy"]))
+    energy_points = w["energy"] * (1 - abs(song["energy"] - user_prefs["energy"]))
     score += energy_points
     reasons.append(f"energy closeness (+{energy_points:.2f})")
 
     if user_prefs.get("likes_acoustic", False):
-        acoustic_points = song["acousticness"]
+        acoustic_points = w["acoustic"] * song["acousticness"]
     else:
-        acoustic_points = 1 - song["acousticness"]
+        acoustic_points = w["acoustic"] * (1 - song["acousticness"])
     score += acoustic_points
     reasons.append(f"acoustic fit (+{acoustic_points:.2f})")
 
     return score, reasons
 
-def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
+def recommend_songs(
+    user_prefs: Dict, songs: List[Dict], k: int = 5, weights: Optional[Dict] = None
+) -> List[Tuple[Dict, float, str]]:
     """Score every song with score_song, then return the top k as (song, score, explanation)."""
     scored = []
     for song in songs:
-        score, reasons = score_song(user_prefs, song)
+        score, reasons = score_song(user_prefs, song, weights)
         scored.append((song, score, "; ".join(reasons)))
     return sorted(scored, key=lambda item: item[1], reverse=True)[:k]
