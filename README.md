@@ -434,5 +434,6 @@ Read and complete `model_card.md`:
 
 Write 1 to 2 paragraphs here about what you learned:
 
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
+**How recommenders turn data into predictions.** This project showed me that a recommender turns data into a prediction in three simple steps: describe each song with numbers and labels, describe the listener the same way, then score how well the two match and sort the results. The model never "knows" music. It only compares labels and measures distances. The reasons list next to each score made that easy to see, and it made bad picks easy to spot.
+
+**Where bias or unfairness can show up.** Bias shows up in the choices behind the score. I made genre worth more than mood, so Gym Hero (pop but intense) outranked happier songs for pop fans. Exact matching meant "indie pop" counted for nothing for a "pop" fan. And with 15 of 17 genres on a single song, most labels could only help one or two songs. In a real app, choices like these, plus whose listening data gets collected, could quietly favor some listeners and artists over others.

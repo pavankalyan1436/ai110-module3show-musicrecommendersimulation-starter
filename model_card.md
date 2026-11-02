@@ -118,9 +118,10 @@ Other limits I noticed:
 
 ## 9. Personal Reflection
 
-TODO: replace this with your own words. Answer these four questions:
+**Biggest learning moment.** The biggest moment was my "Sad but Energetic" test. I asked for energy 0.95, and the top song was a slow blues track with energy 0.40. The reasons list showed me why: matching genre and mood added 3.5 points, and energy could only add 1.5. Before that, I assumed the energy score would keep the results honest. I learned that the weights are really decisions about what the system values, and that a bias can hide inside a number that looks harmless.
 
-- What was your biggest learning moment during this project?
-- How did AI tools help you, and when did you need to double-check them?
-- What surprised you about how simple rules can still feel like recommendations?
-- What would you try next if you extended this project?
+**How AI helped, and when I double-checked it.** AI helped me plan the scoring recipe, write the CSV loader and the scoring code, generate 10 extra songs, and draft my documentation. But I had to check it all the time. My first attempt at adding the new songs never changed the file, and a row count of 10 instead of 20 showed me. I pasted a section over my whole README and lost other sections, and a heading check caught it. One AI answer said partial credit for rock and metal would move Iron Cathedral to second place, but when I ran the numbers it was third unless mood got partial credit too. Plain `pytest` also failed until I added a small config file. The lesson: run it and look at the real output instead of trusting the explanation.
+
+**What surprised me.** I was surprised how much a simple point system feels like a real recommendation. Nothing in it understands music, but a ranked list with a "because..." line next to each song feels smart. Sunrise City for a pop fan and Library Rain for a lofi fan felt right. It also showed me that an explanation can sound confident even when the pick is wrong, like Bayou Midnight.
+
+**What I would try next.** I would give partial credit for close genres and moods, use valence and danceability, add a rule so the top 5 has more variety, and let a listener name more than one favorite genre. After that, I would try learning from skips and likes, like real apps do.
